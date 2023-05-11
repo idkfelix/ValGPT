@@ -89,7 +89,7 @@ def SendMessage(cid, msg):
 
 def GetResponse(username, msg):
     openai.api_key = config["openai_key"]
-    prompt = config["prompt"] + f"\n\n{msg}\nAI:"
+    prompt = config["prompt"]
     completions = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -118,24 +118,24 @@ async def ws():
 
         while True:
             response = await websocket.recv()
-            if len(response) > 0 and json.loads(response)[2]['uri'] == "/chat/v6/messages" and json.loads(response)[2]["data"]["messages"][0]["game_name"] != username:
+
+            if len(response) > 0 and json.loads(response)[2]['uri'] == "/chat/v6/messages":
                 cmsgid = json.loads(response)[2]["data"]["messages"][0]["id"]
-
-                if cmsgid in msgids:
-                    continue
-                else:
-                    msg = json.loads(response)[2]["data"]["messages"][0]
-                    name = msg["game_name"]
-                    body = msg["body"]
-                    cid = msg["cid"]
-                    print(f"{name}: {body}")
-
-                    try:
-                        GPTmsg = GetResponse(name, body)
-                        SendMessage(cid,GPTmsg)
-                        print(username+f": {GPTmsg}")
-                    except Exception:
-                         continue
+                msg = json.loads(response)[2]["data"]["messages"][0]
+                name = msg["game_name"]
+                body = msg["body"]
+                cid = msg["cid"]
+                if  name != username:
+                    if cmsgid in msgids:
+                        continue
+                    else:
+                        print(f"{name}: {body}")
+                        try:
+                            GPTmsg = GetResponse(name, body)
+                            SendMessage(cid,GPTmsg)
+                            print(username+f": {GPTmsg}")
+                        except Exception:
+                            continue
                 msgids.append(cmsgid)
 
 try:
