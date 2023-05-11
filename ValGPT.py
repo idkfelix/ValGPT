@@ -1,6 +1,7 @@
 import os
 import json
 import ssl
+import openai
 import asyncio
 import requests
 import websockets
@@ -26,7 +27,7 @@ default_prompt = """Use mostly short sentences unless a longer response is expen
     Speak casually with no punctuation. \n\n 
     """
 
-if not os.path.exists("config.yaml"):
+if not os.path.exists("config.yml"):
     default_config = f"openai_key:\nhost_username:\nprompt: | \n    {default_prompt}"
     with open("config.yml", "w") as f:
                 f.write(default_config)
@@ -34,7 +35,7 @@ if not os.path.exists("config.yaml"):
     input("Press Enter to continue...")
     exit()
 else:
-    with open("config.yaml", 'r') as f:
+    with open("config.yml", 'r') as f:
             config = safe_load(f)
 
 def getlockData():
@@ -51,21 +52,20 @@ except OSError:
      print("Make Sure Valorant Is running \n")
      input("Press Enter to continue...")
 
-def GetResponse(message):
-    token = config["openai_key"]
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {token}"
-    }
-    body = {
-        "model": "gpt-3.5-turbo",
-        "messages": [{"role": "assistant", "content": ""},{"role": "user", "content": message}],
-        "max_tokens": 40,
-        "stop": "."
-    }
-    response = requests.request("POST", url, json=body, headers=headers, verify=False)
-    return response.json()["choices"][0]["message"]["content"] 
+def GetResponse(username, msg):
+    openai.api_key = config["openai_key"]
+    prompt = config["prompt"] + f"\n\n{msg}\nAI:"
+    completions = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "assistant", "name":config["host_username"], "content": "whats up?"},
+            {"role": "user", "name": username, "content": msg},
+        ],
+    )
+
+    message = completions.choices[0].message.content
+    return message
 
 def SendMessage(cid, msg):
     url = f"https://127.0.0.1:{lockfile['port']}/chat/v6/messages/"
@@ -109,9 +109,13 @@ async def ws():
                     body = msg["body"]
                     cid = msg["cid"]
                     print(f"{name}: {body}")
-                    GPTmsg = GetResponse(config["prompt"] + body)
-                    SendMessage(cid,GPTmsg)
-                    print(f"ValGPT: {GPTmsg}")
+                    
+                    try:
+                        GPTmsg = GetResponse(name, body)
+                        SendMessage(cid,GPTmsg)
+                        print(config["host_username"]+f": {GPTmsg}")
+                    except Exception:
+                         continue
                 msgids.append(cmsgid)
 
 try:
