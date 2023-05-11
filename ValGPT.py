@@ -21,14 +21,15 @@ ____   ____      .__    _____________________________
                \/             \/                     
 """)
 
-default_prompt = """Use mostly short sentences unless a longer response is expencted.
+default_prompt = """you are a chat bot for a Valorant in game chat.
+    Use mostly short sentences unless a longer response is expencted.
     Act as a normal person who responds unprofessionally to conversation.
-    Do not act as an assistant, but as a person.
-    Speak casually with no punctuation. \n\n 
+    Do not act as an AI, but as a person, make no referance to being a AI chat bot.
+    Speak casually with no punctuation, dont be appolagetic. \n\n 
     """
 
 if not os.path.exists("config.yml"):
-    default_config = f"openai_key:\nhost_username:\nprompt: | \n    {default_prompt}"
+    default_config = f"openai_key: \nprompt: | \n    {default_prompt}"
     with open("config.yml", "w") as f:
                 f.write(default_config)
     print("Fill out the config.yml file \n")
@@ -48,24 +49,28 @@ def getlockData():
 
 try:
     lockfile = getlockData()
-except OSError:
+except Exception:
      print("Make Sure Valorant Is running \n")
      input("Press Enter to continue...")
 
-def GetResponse(username, msg):
-    openai.api_key = config["openai_key"]
-    prompt = config["prompt"] + f"\n\n{msg}\nAI:"
-    completions = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": prompt},
-            {"role": "assistant", "name":config["host_username"], "content": "whats up?"},
-            {"role": "user", "name": username, "content": msg},
-        ],
-    )
+def GetUsername():
+    url = f"https://127.0.0.1:{lockfile['port']}/player-account/aliases/v1/active"
 
-    message = completions.choices[0].message.content
-    return message
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Basic " + b64encode(('riot:' + lockfile['password']).encode()).decode()
+    }
+
+    response = requests.request("GET", url, headers=headers, verify=False)
+    l = json.loads(response.text)
+    return l["game_name"]
+
+try:
+    username = GetUsername()
+except Exception:
+     print("Make Sure Valorant Is running \n")
+     input("Press Enter to continue...")
+
 
 def SendMessage(cid, msg):
     url = f"https://127.0.0.1:{lockfile['port']}/chat/v6/messages/"
@@ -81,6 +86,21 @@ def SendMessage(cid, msg):
     }
 
     requests.request("POST", url, json=body, headers=headers, verify=False)
+
+def GetResponse(username, msg):
+    openai.api_key = config["openai_key"]
+    prompt = config["prompt"] + f"\n\n{msg}\nAI:"
+    completions = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "assistant", "name":username, "content": "whats up?"},
+            {"role": "user", "name": username, "content": msg},
+        ],
+    )
+
+    message = completions.choices[0].message.content
+    return message
 
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.check_hostname = False
@@ -98,7 +118,7 @@ async def ws():
 
         while True:
             response = await websocket.recv()
-            if len(response) > 0 and json.loads(response)[2]['uri'] == "/chat/v6/messages" and json.loads(response)[2]["data"]["messages"][0]["game_name"] != config["host_username"]:
+            if len(response) > 0 and json.loads(response)[2]['uri'] == "/chat/v6/messages" and json.loads(response)[2]["data"]["messages"][0]["game_name"] != username:
                 cmsgid = json.loads(response)[2]["data"]["messages"][0]["id"]
 
                 if cmsgid in msgids:
@@ -109,11 +129,11 @@ async def ws():
                     body = msg["body"]
                     cid = msg["cid"]
                     print(f"{name}: {body}")
-                    
+
                     try:
                         GPTmsg = GetResponse(name, body)
                         SendMessage(cid,GPTmsg)
-                        print(config["host_username"]+f": {GPTmsg}")
+                        print(username+f": {GPTmsg}")
                     except Exception:
                          continue
                 msgids.append(cmsgid)
