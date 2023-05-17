@@ -94,7 +94,7 @@ def GetResponse(messages):
         model="gpt-3.5-turbo",
         messages=messages
     )
-    for x in range(5):
+    for x in range(25):
         try:
             completions.choices[0].message.content
             break
@@ -141,7 +141,7 @@ async def ws():
 
                     if  name != username:
                         try:
-                            threading.Thread(target=aiMessage(cid, messages), daemon=True).start()
+                            threading.Thread(target=aiMessage(cid, messages[-5:]), daemon=True).start()
                         except Exception:
                             continue
                 msgids.append(cmsgid)
