@@ -5,6 +5,7 @@ import openai
 import asyncio
 import requests
 import websockets
+import threading
 from yaml import safe_load
 from base64 import b64encode
 from urllib3 import disable_warnings, exceptions
@@ -101,6 +102,10 @@ def GetResponse(messages):
             continue
     return completions.choices[0].message.content
 
+def aiMessage(cid, messages):
+    GPTmsg = GetResponse(messages)
+    SendMessage(cid,GPTmsg)
+
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
@@ -132,15 +137,11 @@ async def ws():
                     continue
                 else:
                     messages.append({"role":"user","name":name,"content":body})
-                    # print(messages)
+                    print(f"{name}: {body} \n")
 
                     if  name != username:
-                        print(f"{name}: {body}")
-                        
                         try:
-                            GPTmsg = GetResponse(messages)
-                            SendMessage(cid,GPTmsg)
-                            print(username+f": {GPTmsg}")
+                            threading.Thread(target=aiMessage(cid, messages), daemon=True).start()
                         except Exception:
                             continue
                 msgids.append(cmsgid)
