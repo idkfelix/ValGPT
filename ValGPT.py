@@ -87,20 +87,19 @@ def SendMessage(cid, msg):
 
     requests.request("POST", url, json=body, headers=headers, verify=False)
 
-def GetResponse(username, msg):
+def GetResponse(messages):
     openai.api_key = config["openai_key"]
-    prompt = config["prompt"]
     completions = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": prompt},
-            {"role": "assistant", "name":username, "content": "whats up?"},
-            {"role": "user", "name": username, "content": msg},
-        ],
+        messages=messages
     )
-
-    message = completions.choices[0].message.content
-    return message
+    for x in range(5):
+        try:
+            completions.choices[0].message.content
+            break
+        except:
+            continue
+    return completions.choices[0].message.content
 
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.check_hostname = False
@@ -115,6 +114,10 @@ async def ws():
         await websocket.send("[5, \"OnJsonApiEvent\"]")
 
         msgids = []
+        messages = [
+            {"role": "system", "content": config["prompt"]},
+            {"role": "assistant", "name":username, "content": "whats up?"},
+            ]
 
         while True:
             response = await websocket.recv()
@@ -125,13 +128,17 @@ async def ws():
                 name = msg["game_name"]
                 body = msg["body"]
                 cid = msg["cid"]
-                if  name != username:
-                    if cmsgid in msgids:
-                        continue
-                    else:
+                if cmsgid in msgids:
+                    continue
+                else:
+                    messages.append({"role":"user","name":name,"content":body})
+                    # print(messages)
+
+                    if  name != username:
                         print(f"{name}: {body}")
+                        
                         try:
-                            GPTmsg = GetResponse(name, body)
+                            GPTmsg = GetResponse(messages)
                             SendMessage(cid,GPTmsg)
                             print(username+f": {GPTmsg}")
                         except Exception:
