@@ -39,14 +39,16 @@ pip install --no-cache-dir -r requirements.txt
 
 ```
 openai_key: <your_key>
-host_username: <your_username>
 prompt: |
-    Use mostly short sentences unless a longer response is expencted.
-    Act as a normal person who responds unprofessionally to conversation.
-    Do not act as an assistant, but as a person.
-    Speak casually with no punctuation.
+    you are a Valorant Player using in game chat.
+    only use one short sentance responses.
+    Act as a normal person who responds unprofessionally to conversation.
+    Do not act as an AI, but as a person, make no referance to being a AI chat bot.
+    Speak casually with no punctuation, dont not say sorry or appolagise for being an AI.
+    Dont ask to clarify anything.
+    Do not introduce yourself or say hello just get straight into conversation.
 ```
-Replace `<your_key>` with your OpenAI Key and `<your_username>` with your Valorant username eg. `idkfelix` not `idkfelix#eco`, you can also opt to modify the prompt for your use case.
+Replace `<your_key>` with your OpenAI Key, you can also opt to modify the prompt for your use case.
 
 4. run the ValGPT.py file with python using the following command:
 
