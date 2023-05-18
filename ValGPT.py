@@ -9,7 +9,7 @@ from re import sub as resub
 # Third-party library imports
 from requests import request
 from websockets import connect, exceptions
-from openai import api_key, ChatCompletion
+import openai
 from yaml import safe_load
 from urllib3 import disable_warnings, exceptions
 from threading import Thread
@@ -102,23 +102,13 @@ def SendMessage(cid, msg):
 
 # Define OpenAI completion function
 def GetResponse(messages):
-    api_key = config["openai_key"]
-    completions = ChatCompletion.create(
+    openai.api_key = config["openai_key"]
+    completions = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages
     )
-    for x in range(25):
-        try:
-            completions.choices[0].message.content
-            break
-        except:
-            continue
+    # logging.INFO(completions)
     return completions.choices[0].message.content
-
-# Define AI message function
-def aiMessage(cid, messages):
-    GPTmsg = GetResponse(messages)
-    SendMessage(cid,GPTmsg)
 
 # Config for websocket
 ssl_context = SSLContext(PROTOCOL_TLS_CLIENT)
@@ -148,9 +138,8 @@ async def ws():
                 cmsgid = jsonLoads(response)[2]["data"]["messages"][0]["id"]
                 msg = jsonLoads(response)[2]["data"]["messages"][0]
                 unfixedName = msg["game_name"]
-                name = resub(r'[^\w\s~!@#\$%\^&\*_\-+=\|\\\(\){}\[\]:;"\'<>,\.\?/]+', ' ', unfixedName)
-                unfixedBody = msg["body"]
-                body = resub(r'[^\w\s~!@#\$%\^&\*_\-+=\|\\\(\){}\[\]:;"\'<>,\.\?/]+', ' ', unfixedBody)
+                name = resub(r'[^a-zA-Z0-9_-]', '_', unfixedName)
+                body = msg["body"]
                 cid = msg["cid"]
                 if cmsgid in msgids:
                     continue
@@ -160,7 +149,8 @@ async def ws():
 
                     if  name != username:
                         try:
-                            Thread(target=aiMessage(cid, messages[-5:]), daemon=True).start()
+                            GPTmsg = GetResponse(messages)
+                            SendMessage(cid, GPTmsg)
                         except Exception:
                             continue
                 msgids.append(cmsgid)
