@@ -53,5 +53,5 @@ Replace `<your_key>` with your OpenAI Key, you can also opt to modify the prompt
 4. run the ValGPT.py file with python using the following command:
 
 ```
-python TTS-Bot.py
+python ValGPT.py
 ```
