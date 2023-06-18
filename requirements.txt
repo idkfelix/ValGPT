@@ -1,5 +1,0 @@
-openai==0.27.6
-PyYAML==6.0
-Requests==2.30.0
-urllib3==1.26.12
-websockets==11.0.3

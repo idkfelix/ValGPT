@@ -10,9 +10,10 @@
   </pre>
   </body>
   <h3>AI Chatbot for Valorant Text Chat using OpenAI GPT-3.5 Turbo</h3>
+  <h4>Build with Typescript, Electron and React</h4>
 
   <img src="https://img.shields.io/badge/OpenAI-412991.svg?style=for-the-badge&logo=OpenAI&logoColor=white" alt="OpenAI Badge">
-  <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" alt="Python Badge">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square" alt="TypeScript Badge">
   <img src="https://img.shields.io/badge/Valorant-FA4454.svg?style=for-the-badge&logo=Valorant&logoColor=white" alt="Valorant Badge">
 
 </div>
@@ -21,37 +22,30 @@
 
 - Automatic AI text response to any chat messages in Valorant game chat
 
-## Requirements
+## Run
 
-- Python 3.6+
-- PyPi
+1. Download the latest release from the [releases page](https://github.com/idkfelix/ValGPT/releases)
 
-## Setup
+2. Run the installer
+
+3. Configure your OpenAI API key from the settings tab
+
+4. Start Valorant
+
+5. Initialise the Listener and ValGPT from the main menu
+
+## Build
 
 1. Clone this repository to your local machine
-2. Install the requirements.txt with pypi using the following command:
+
+2. Install the npm modules with npm using the following command:
 
 ```
-pip install --no-cache-dir -r requirements.txt
+npm install
 ```
 
-3. Create a `config.yaml` file in the root directory of the project, containing the following information:
+3. Build the application with the following command:
 
 ```
-openai_key: <your_key>
-prompt: |
-    you are a Valorant Player using in game chat.
-    only use one short sentance responses.
-    Act as a normal person who responds unprofessionally to conversation.
-    Do not act as an AI, but as a person, make no referance to being a AI chat bot.
-    Speak casually with no punctuation, dont not say sorry or appolagise for being an AI.
-    Dont ask to clarify anything.
-    Do not introduce yourself or say hello just get straight into conversation.
-```
-Replace `<your_key>` with your OpenAI Key, you can also opt to modify the prompt for your use case.
-
-4. run the ValGPT.py file with python using the following command:
-
-```
-python ValGPT.py
+npm run build
 ```
