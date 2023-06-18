@@ -28,7 +28,7 @@ router.post('/api/sendMsg', async (req, res) => {
 
 router.post('/api/toggleWs/:state', (req:any, res) => {
   try {
-    toggleValListener(req.body.key, req.params.state);
+    toggleValListener(req.body.key, req.body.prompt, req.params.state);
     res.sendStatus(200);
   } catch {
     res.status(500).json({ error: 'Server Error' });

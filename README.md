@@ -13,7 +13,7 @@
   <h4>Build with Typescript, Electron and React</h4>
 
   <img src="https://img.shields.io/badge/OpenAI-412991.svg?style=for-the-badge&logo=OpenAI&logoColor=white" alt="OpenAI Badge">
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square" alt="TypeScript Badge">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge?logo=TypeScript&logoColor=FFF" alt="TypeScript Badge">
   <img src="https://img.shields.io/badge/Valorant-FA4454.svg?style=for-the-badge&logo=Valorant&logoColor=white" alt="Valorant Badge">
 
 </div>

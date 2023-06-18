@@ -5,20 +5,6 @@ import { websocket } from './server';
 import { sendMessage } from './functions/message';
 import { getCompletion } from './functions/completion';
 
-const dprompt = `you are a Valorant Player using in game chat.
-only use one short sentance responses.
-Act as a normal person who responds unprofessionally to conversation.
-Do not act as an AI, but as a person, make no referance to being a AI chat bot.
-Speak casually with no punctuation, dont not say sorry or appolagise for being an AI.
-Dont ask to clarify anything.
-Do not introduce yourself or say hello just get straight into conversation 
-`
-
-const messages = [
-    {"role": "system", "content": dprompt},
-    {"role": "assistant", "name":"ValGPT", "content": "whats up?"},
-]
-
 const msgids:any[] = []
 let isActive = false
 
@@ -32,7 +18,12 @@ export const toggleActive = async (state:string) => {
     }
   };
 
-export async function valListener(key:string): Promise<any> {
+export async function valListener(key:string, prompt:string): Promise<any> {
+    const messages = [
+        {"role": "system", "content": prompt},
+        {"role": "assistant", "name":"ValGPT", "content": "whats up?"},
+    ]
+
     console.log(key)
     const lockData = await getLockData()
     const username = await getUsername(lockData)

@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react'
 const localKey = "valGPT.config";
+const dprompt = `You are a Valorant Player using in game chat.
+Only use one short sentence responses.
+Act as a normal person who responds unprofessionally to conversation.
+Do not act as an AI, but as a person.
+Speak casually with no punctuation, don't not say sorry for being an AI.
+Don't ask to clarify anything.
+Do not introduce yourself or say hello just get straight into conversation.
+`
 
 const Options = () => {
   const [isListening, setIsListening] = useState<boolean>(false);
@@ -9,10 +17,15 @@ const Options = () => {
     return storedKey ?? "";
   });
 
+  const [prompt, setPrompt] = useState<string>(() => {
+    const storedPrompt = localStorage.getItem(`${localKey}.prompt`);
+    return storedPrompt ?? dprompt;
+  });
+
   const handleListenClick = async () => {
     if (!isListening) {
       await fetch('http://localhost:1337/api/toggleWs/on', {
-        body: JSON.stringify({'key':key}),
+        body: JSON.stringify({'key':key,'prompt':prompt}),
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
