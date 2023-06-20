@@ -26,10 +26,14 @@ function App() {
   }, [settings])
 
   return (
-    <div className='p-5 h-[100vh]'>
-      <button className='mb-2' onClick={() => toggleSettings(!settings)}>
-        ⚙
-      </button>
+    <div className='p-5 pt- h-[100vh]'>
+      <div className='flex flex-row'>
+        <button className='mb-2' onClick={() => toggleSettings(!settings)}>
+          ⚙
+        </button>
+        <h1 className='text-white text-center w-full font-bold text-xl mb-2'>ValGPT</h1>
+        <div className='opacity-0'>⚙</div>
+      </div>
       {!settings &&       
         <div className='h-[85%]'>
           <Options/>

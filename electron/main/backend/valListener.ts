@@ -4,6 +4,7 @@ import { getUsername } from './functions/username';
 import { websocket } from './server';
 import { sendMessage } from './functions/message';
 import { getCompletion } from './functions/completion';
+import { profanity } from '@2toad/profanity';
 
 const msgids:any[] = []
 let isActive = false
@@ -62,7 +63,8 @@ export async function valListener(key:string, prompt:string): Promise<any> {
                     if (name !== username && isActive == true) {
                         try {
                             const GPTmsg = await getCompletion(messages, key)
-                            console.log(GPTmsg)
+                            const censored = await profanity.censor(GPTmsg)
+                            console.log(censored)
                             sendMessage(lockData, cid, GPTmsg);
                         } catch (error) {
                             console.log(error)
