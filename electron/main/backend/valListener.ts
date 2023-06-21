@@ -27,7 +27,8 @@ export async function valListener(key:string, prompt:string): Promise<any> {
 
     console.log(key)
     const lockData = await getLockData()
-    const username = await getUsername(lockData)
+    const unfixedUsername = await getUsername(lockData)
+    const username = unfixedUsername.replace(/[^a-zA-Z0-9_-]/g, '_');
 
     const ws = new WebSocket(`wss://riot:${lockData.password}@127.0.0.1:${lockData.port}`, {
         rejectUnauthorized: false
