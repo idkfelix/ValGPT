@@ -55,23 +55,23 @@ export async function valListener(key:string, prompt:string): Promise<any> {
                 const name = unfixedName.replace(/[^a-zA-Z0-9_-]/g, '_');
                 const body = msg["body"];
                 const cid = msg["cid"];
-        
+    
                 if (!msgids.includes(cmsgid)) {
+                    msgids.push(cmsgid)
                     messages.push({ "role": "user", "name": name, "content": body });
                     websocket.sendMessageLog(name, body)
         
                     if (name !== username && isActive == true) {
                         try {
                             const GPTmsg = await getCompletion(messages, key)
-                            const censored = await profanity.censor(GPTmsg)
+                            console.log(GPTmsg)
+                            const censored = profanity.censor(GPTmsg)
                             console.log(censored)
-                            sendMessage(lockData, cid, GPTmsg);
+                            sendMessage(lockData, cid, censored);
                         } catch (error) {
                             console.log(error)
                         }
                     }
-        
-                    msgids.push(cmsgid);
                 }
             }
         }        
