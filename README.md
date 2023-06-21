@@ -28,7 +28,7 @@
 
 2. Run the installer
 
-3. Configure your OpenAI API key from the settings tab
+3. Configure your OpenAI API key from the settings tab (you must setup a paid account for your Key to work!)
 
 4. Start Valorant
 
